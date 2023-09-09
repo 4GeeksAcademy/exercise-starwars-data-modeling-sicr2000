@@ -1,32 +1,66 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy import create_engine
 from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
+class User(Base):
+    __tablename__ = 'user'
     # Here we define columns for the table person
     # Notice that each column is also a normal Python instance attribute.
+
     id = Column(Integer, primary_key=True)
+    
     name = Column(String(250), nullable=False)
+    last_name = Column (String(250), nullable=False)
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+    username = Column (String (80), nullable=False) # tabla person => ALTER => Migraciones SQL => Sync => Scripts
+    email = Column(String(256), nullable=False, unique=True)
+
+    # class methods - static methods - methods @staticmethod
+    @staticmethod
+    def acellerate(cls):
+        pass
+
+    
+class Planets(Base):
+
+    __tablename__ = "planets"
+
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    name = Column(String(180), nullable=False)
+    atmosphere = Column(Boolean, nullable=True)
 
-    def to_dict(self):
-        return {}
+class Characters(Base):
+
+    __tablename__ = "characters"
+    id = Column(Integer, primary_key=True)
+    full_name = Column(String(300), nullable=False)
+    hair_color = Column(String(30), nullable=True)
+    eye_color = Column(String(30), nullable=True)
+
+class Favorites(Base):
+    __tablename__ = "favorites"
+
+    id = Column(Integer, primary_key=True)
+
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user = relationship(User)
+
+    character_id = Column(Integer, ForeignKey('characters.id'), nullable=True)
+    character = relationship(Characters)
+
+    planet_id = Column(Integer, ForeignKey('planets.id'), nullable=True)
+    planet = relationship(Planets)
 
 ## Draw from SQLAlchemy base
 render_er(Base, 'diagram.png')
+
+# rolando = Person(name="Rolando", last_name="Uzcategui")
+
+# rolando.save() #Insert - RAM
+
+# Base.commit() #Execute Query
